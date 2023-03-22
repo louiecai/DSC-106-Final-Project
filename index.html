@@ -1,65 +1,142 @@
 <html>
-  <head>
-    <title>DSC 106 Final Project</title>
-    <script type="text/javascript" src="app.js"></script>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-  </head>
 
-  <body onload="final_project()">
+<head>
+  <title>DSC 106 Final Project</title>
+  <script type="text/javascript" src="app.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body onload="final_project()">
+  <div>
+    <h2 class="section">Final Project</h2>
+    <div>As we examine the airbnb dataset for various European cities, we can discern some fascinating differences in
+      the way tourists behave and what they prefer when it comes to their airbnb experience.</div>
+    <br />
     <div>
-      <h2 class="section">Final Project</h2>
+      <h3>Plot 1:</h3>
 
+      <div id="q1"></div>
+      <h4>Plot:</h4>
+      <div class="center_plot">
+        <select id="q1_button"></select>
+      </div>
+      <div id="q1_plot" class="center_plot"></div>
+      <br />
+      <div>We start with the scatter plot, which shows the distance from the city center vs. the total price of the
+        listings. Interestingly, we see no correlation between these two variables, suggesting that tourists are willing
+        to pay similar prices for listings located at different distances from the city center.</div>
       <br />
       <div>
-        <h3>Plot 1:</h3>
-
-        <div id="q1"></div>
-        <h4>Plot:</h4>
-        <div class="center_plot">
-          <select id="q1_button"></select>
-        </div>
-        <div id="q1_plot" class="center_plot"></div>
+        Choice of color scheme: nothing special, just wanted to make the plot look a little more interesting. I used the
+        same color for each city in plot 1 and 2 so that the reader can easily associate the cities with their
+        corresponding colors.
         <br />
+        Marks: Points
+        <br />
+        Channels: position (x, y) and color
       </div>
-
-      <div>
-        <h3>Plot 2:</h3>
-
-        <div id="q2"></div>
-        <h4>Plot:</h4>
-        <div id="q2_plot" class="center_plot"></div>
-        <br />
-      </div>
-
-      <div>
-        <h3>Plot 3:</h3>
-
-        <div id="q3"></div>
-        <h4>Plot:</h4>
-        <div id="q3_plot" class="center_plot"></div>
-        <br />
-      </div>
-      
-      <div>
-        <h3>Plot 4:</h3>
-
-        <div id="q4"></div>
-        <h4>Plot:</h4>
-        <div id="q4_plot" class="center_plot"></div>
-        <br />
     </div>
-    
-    <div>
-        <h3>Plot 5:</h3>
 
-        <div id="q5"></div>
-        <h4>Plot:</h4>
-        <div class="center_plot">
-          <select id="q5_button"></select>
-        </div>
-        <div id="q5_plot" class="center_plot">
-        </div>
+    <div>
+      <h3>Plot 2:</h3>
+
+      <div id="q2"></div>
+      <h4>Plot:</h4>
+      <div id="q2_plot" class="center_plot"></div>
+      <br />
+      <div>
+        Moving on to the guest satisfaction ratings, we can see a clear winner among the cities: Athens. With an
+        outstanding rating of 95, it seems that the Greek capital is winning over the hearts of tourists more than any
+        other city in our dataset. London, on the other hand, falls behind with a rating of only 90.75, indicating that
+        there is room for improvement in the city's airbnb offerings.
+      </div>
+      <br />
+      <div>
+        Choice of color scheme: I used the same color scheme as in plot 1, so that the reader can easily associate the
+        cities with their corresponding colors.
         <br />
-  </body>
+        Marks: Bars
+        <br />
+        Channels: length and color
+      </div>
+    </div>
+
+    <div>
+      <h3>Plot 3:</h3>
+
+      <div id="q3"></div>
+      <h4>Plot:</h4>
+      <div id="q3_plot" class="center_plot"></div>
+      <br />
+      <div>
+        When it comes to cleanliness ratings, we can see from the stacked bar plot that shared rooms have the greatest
+        deviation in each city. This suggests that there may be a lack of consistency in the cleaning standards across
+        shared rooms, which could be a cause of concern for potential guests. For example, Budapest has a average
+        cleanliness rating of 9.6 for shared rooms, whereas Vienna has a rating of 8.14. This could be a cause for
+        concern for potential guests.
+      </div>
+      <br />
+      <div>
+        Choice of color scheme: these colors are used to distinguish the different types of rooms. They are different so
+        that the reader can easily distinguish between the different types of rooms.
+        <br />
+        Marks: Bars
+        <br />
+        Channels: length and color
+      </div>
+    </div>
+
+    <div>
+      <h3>Plot 4:</h3>
+
+      <div id="q4"></div>
+      <h4>Plot:</h4>
+      <div id="q4_plot" class="center_plot"></div>
+      <br />
+      <div>
+        However, the distribution of apartments and entire homes among the cities seems to be a significant deciding
+        factor for tourists. As the choropleth shows, Athens has the highest percentage of apartments and entire homes,
+        whereas Barcelona has the lowest. This suggests that tourists visiting Athens may prefer to have a more private
+        experience, whereas those visiting Barcelona may be more inclined to explore the city from a local's perspective
+        by staying in other types of accommodations.
+      </div>
+      <br />
+      <div>
+        Choice of color scheme: I used a sequential color scheme to show the percentage of apartments and entire
+        homes. The colors are different so that the reader can easily distinguish between the different types of rooms.
+        <br />
+        Marks: polygons
+        <br />
+        Channels: color and area
+      </div>
+    </div>
+
+    <div>
+      <h3>Plot 5:</h3>
+
+      <div id="q5"></div>
+      <h4>Plot:</h4>
+      <div class="center_plot">
+        <select id="q5_button"></select>
+      </div>
+      <div id="q5_plot" class="center_plot">
+      </div>
+      <br />
+      <div>
+        Lastly, we come to the box plot that shows the distance to the nearest subway station for each city. We see that
+        Barcelona has the shortest distance, while Athens has the longest. This may indicate that tourists visiting
+        Barcelona are more likely to use public transportation, whereas those visiting Athens may prefer to walk or use
+        other modes of transportation.
+      </div>
+      <br />
+      <div>
+        Choice of color scheme: same color scheme as in plot 1 and 2, so that the reader can easily associate the cities
+        <br />
+        Marks: boxes
+        <br />
+        Channels: length, position, color
+      </div>
+</body>
+
 </html>

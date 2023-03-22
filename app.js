@@ -1,5 +1,5 @@
 function final_project() {
-    var filePath = "data/final_output.csv";
+    var filePath = "final_output.csv";
     plot1(filePath);
     plot2(filePath);
     plot3(filePath);
@@ -226,7 +226,7 @@ var plot4 = function (filePath) {
             console.log(data);
 
             // get the percentage of listings that are private rooms
-            var privateRoom = d3.rollup(data, v => [d3.mean(v, d => d.room_type == "Private room" ? 1.0 : 0.0), v[0].lng, v[0].lat], d => d.city);
+            var privateRoom = d3.rollup(data, v => [d3.mean(v, d => d.room_type == "Entire home/apt" ? 1.0 : 0.0), v[0].lng, v[0].lat], d => d.city);
             privateRoom = d3.map(privateRoom, function (d) {
                 return { city: d[0], percentage: d[1][0], lng: d[1][1], lat: d[1][2] };
             });
@@ -234,7 +234,7 @@ var plot4 = function (filePath) {
             var colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, 1]);
 
             // plot the percentage of private rooms on the map and add names of the cities
-            svg.selectAll("circle").data(privateRoom).enter().append("circle").attr("cx", d => projection([d.lng, d.lat])[0]).attr("cy", d => projection([d.lng, d.lat])[1]).attr("r", 7).attr("fill", d => colorScale(d.percentage)).attr("stroke", "black").attr("stroke-width", 0.5);
+            svg.selectAll("circle").data(privateRoom).enter().append("circle").attr("cx", d => projection([d.lng, d.lat])[0]).attr("cy", d => projection([d.lng, d.lat])[1]).attr("r", d => 12 * d.percentage).attr("fill", d => colorScale(d.percentage)).attr("stroke", "black").attr("stroke-width", 0.5);
             svg.selectAll("text").data(privateRoom).enter().append("text").attr("x", d => projection([d.lng, d.lat])[0] + 10).attr("y", d => projection([d.lng, d.lat])[1] + 5).text(d => d.city[0].toUpperCase() + d.city.slice(1)).attr("font-size", "13px").style("fill", "black").style("font-weight", "bold");
 
             // legend
@@ -245,7 +245,7 @@ var plot4 = function (filePath) {
             legend.selectAll("rect").data([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]).enter().append("rect").attr("x", -20).attr("y", d => yScale(d)).attr("width", 20).attr("height", 20).attr("fill", d => colorScale(d)).attr("stroke", "black").attr("stroke-width", 0.5);
 
             // title
-            svg.append("text").attr("x", MARGIN + 200).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Percentage of Private Rooms in Each City").style("font-weight", "bold");
+            svg.append("text").attr("x", MARGIN + 200).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Percentage of Apartments/Homes in Each City").style("font-weight", "bold");
         });
     });
 
