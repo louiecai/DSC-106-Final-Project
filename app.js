@@ -1,4 +1,3 @@
-
 function final_project() {
     var filePath = "data/final_output.csv";
     plot1(filePath);
@@ -254,6 +253,70 @@ var plot4 = function (filePath) {
 
 var plot5 = function (filePath) {
     d3.csv(filePath).then(function (data) {
+        // create box plots for each city about the distance (dist)
+        const WIDTH = 700;
+        const HEIGHT = 900;
+        const MARGIN = 120;
 
+        // get all the cities
+        const CITIES = [...new Set(data.map(d => d.city))];
+        var colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(CITIES);
+        var datasets = {};
+        for (var i = 0; i < CITIES.length; i++) {
+            datasets[CITIES[i]] = data.filter(d => d.city == CITIES[i]);
+            // find the stats for each city
+            datasets[CITIES[i] + "q1"] = d3.quantile(datasets[CITIES[i]], 0.25, d => parseFloat(d.metro_dist));
+            datasets[CITIES[i] + "q3"] = d3.quantile(datasets[CITIES[i]], 0.75, d => parseFloat(d.metro_dist));
+            datasets[CITIES[i] + "median"] = d3.median(datasets[CITIES[i]], d => parseFloat(d.metro_dist));
+            var range = datasets[CITIES[i] + "q3"] - datasets[CITIES[i] + "q1"];
+            datasets[CITIES[i] + "min"] = datasets[CITIES[i] + "q1"] - 1.5 * range < d3.min(datasets[CITIES[i]], d => parseFloat(d.metro_dist)) ? d3.min(datasets[CITIES[i]], d => parseFloat(d.metro_dist)) : datasets[CITIES[i] + "q1"] - 1.5 * range;
+            datasets[CITIES[i] + "max"] = datasets[CITIES[i] + "q3"] + 1.5 * range > d3.max(datasets[CITIES[i]], d => parseFloat(d.metro_dist)) ? d3.max(datasets[CITIES[i]], d => parseFloat(d.metro_dist)) : datasets[CITIES[i] + "q3"] + 1.5 * range;
+
+            datasets[CITIES[i] + "yScale"] = d3.scaleLinear().domain([0, datasets[CITIES[i] + "max"] * 1.05]).range([HEIGHT - MARGIN, MARGIN]);
+        }
+
+        // add options to the drop down menu
+        d3.select("#q5_button").selectAll("option").data(CITIES).enter().append("option").attr("value", d => d).text(d => d[0].toUpperCase() + d.slice(1));
+
+        // create the svg
+        var svg = d3.select("#q5_plot").append("svg").attr("width", WIDTH).attr("height", HEIGHT);
+
+        // create the box plots
+        var yAxis = svg.append("g").attr("transform", "translate(" + MARGIN + ",0)");
+
+        var verticalLine = svg.append("line");
+        var box = svg.append("rect");
+        var medianLine = svg.append("line");
+        var minLine = svg.append("line");
+        var maxLine = svg.append("line");
+
+        // create the title
+        var title = svg.append("text").attr("x", MARGIN + 200).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Distance to the Nearest Subway Station").style("font-weight", "bold");
+
+        var yAxisLabel = svg.append("text").attr("x", MARGIN / 2).attr("y", HEIGHT / 2).attr("text-anchor", "middle").attr("font-size", "18px").text("Distance (km)").attr("transform", "rotate(-90 " + MARGIN / 2 + "," + HEIGHT / 2 + ")");
+
+        var update = function () {
+            let city = d3.select("#q5_button").property("value");
+            console.log(city);
+
+            // update the y axis
+            yAxis.transition().duration(1000).call(d3.axisLeft(datasets[city + "yScale"]));
+
+            // update the box plot
+            medianLine.transition().duration(1000).attr("x1", 2 * MARGIN).attr("y1", datasets[city + "yScale"](datasets[city + "median"])).attr("x2", WIDTH - MARGIN * 2).attr("y2", datasets[city + "yScale"](datasets[city + "median"])).attr("stroke", "black").attr("stroke-width", 2);
+            box.transition().duration(1000).attr("x", 2 * MARGIN).attr("y", datasets[city + "yScale"](datasets[city + "q3"])).attr("width", WIDTH - 4 * MARGIN).attr("height", datasets[city + "yScale"](datasets[city + "q1"]) - datasets[city + "yScale"](datasets[city + "q3"])).attr("fill", colorScale(city)).attr("stroke", "black").attr("stroke-width", 2);
+
+            // update the horizontal lines (min, max)
+            minLine.transition().duration(1000).attr("x1", 2 * MARGIN).attr("y1", datasets[city + "yScale"](datasets[city + "min"])).attr("x2", WIDTH - MARGIN * 2).attr("y2", datasets[city + "yScale"](datasets[city + "min"])).attr("stroke", "black").attr("stroke-width", 2);
+            maxLine.transition().duration(1000).attr("x1", 2 * MARGIN).attr("y1", datasets[city + "yScale"](datasets[city + "max"])).attr("x2", WIDTH - MARGIN * 2).attr("y2", datasets[city + "yScale"](datasets[city + "max"])).attr("stroke", "black").attr("stroke-width", 2);
+
+            // update the vertical line
+            verticalLine.transition().duration(1000).attr("x1", MARGIN * 3).attr("y1", datasets[city + "yScale"](datasets[city + "min"])).attr("x2", MARGIN * 3).attr("y2", datasets[city + "yScale"](datasets[city + "max"])).attr("stroke", "black").attr("stroke-width", 2);
+
+            title.transition().duration(1000).text("Distance to the Nearest Subway Station (" + city[0].toUpperCase() + city.slice(1) + ")");
+        }
+
+        update();
+        d3.select("#q5_button").on("change", update);
     });
 }
