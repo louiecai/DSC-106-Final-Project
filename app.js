@@ -1,8 +1,11 @@
+
 function final_project() {
     var filePath = "data/final_output.csv";
     plot1(filePath);
     plot2(filePath);
     plot3(filePath);
+    plot4(filePath);
+    plot5(filePath);
 }
 
 var plot1 = function (filePath) {
@@ -42,7 +45,7 @@ var plot1 = function (filePath) {
         // create color based on the city
         var colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(data.map(d => d.city));
 
-        var title = svg.append("text").attr("x", WIDTH / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Airbnb Price vs Distance from City Center");
+        var title = svg.append("text").attr("x", WIDTH / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Airbnb Price vs Distance from City Center").style("font-weight", "bold");
 
         var xAxisLabel = svg.append("text").attr("x", WIDTH / 2).attr("y", HEIGHT - MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "16px").text("Distance from City Center (km)");
         var yAxisLabel = svg.append("text").attr("x", -HEIGHT / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "16px").text("Price (€)").attr("transform", "rotate(-90)");
@@ -69,9 +72,9 @@ var plot1 = function (filePath) {
             points.selectAll("circle").data(current_data).enter().append("circle").attr("cx", d => xScale(parseFloat(d.dist))).attr("cy", d => yScale(parseFloat(d.realSum))).attr("r", 4).attr("fill", d => colorScale(d.city)).attr("opacity", 0.5)
             // enlarge the circles when the mouse is over them
             points.selectAll("circle").on("mouseover", function (d) {
-                d3.select(this).transition().duration(75).attr("r", 15).attr("opacity", 1).attr("stroke", "black").attr("stroke-width", 4);
+                d3.select(this).transition().duration(200).attr("r", 15).attr("opacity", 1).attr("stroke", "black").attr("stroke-width", 4);
             }).on("mouseout", function (d) {
-                d3.select(this).transition().duration(100).attr("r", 4).attr("opacity", 0.5).attr("stroke", "none");
+                d3.select(this).transition().duration(150).attr("r", 4).attr("opacity", 0.5).attr("stroke", "none");
             });
 
 
@@ -108,7 +111,7 @@ var plot2 = function (filePath) {
         // create color based on the city
         var colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(data.map(d => d.city));
 
-        var title = svg.append("text").attr("x", WIDTH / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Average Guest Satisfaction Rating for Each City");
+        var title = svg.append("text").attr("x", WIDTH / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Average Guest Satisfaction Rating for Each City").style("font-weight", "bold");
 
         var xAxis = svg.append("g").attr("transform", "translate(0," + (HEIGHT - MARGIN) + ")").call(d3.axisBottom(xScale)).selectAll("text").attr("font-size", "12.5px");
         var yAxis = svg.append("g").attr("transform", "translate(" + MARGIN + ",0)").call(d3.axisLeft(yScale)).selectAll("text").attr("font-size", "12.5px");
@@ -153,7 +156,7 @@ var plot3 = function (filePath) {
             }
             flattenedData.push(current);
         }
-        console.log(flattenedData)
+        // console.log(flattenedData)
 
         var svg = d3.select("#q3_plot").append("svg").attr("width", WIDTH).attr("height", HEIGHT);
 
@@ -168,12 +171,12 @@ var plot3 = function (filePath) {
         var yAxis = svg.append("g").attr("transform", "translate(" + MARGIN + ",0)").call(d3.axisLeft(yScale)).selectAll("text").attr("font-size", "12.5px");
 
         var stackedData = d3.stack().keys(ROOM_TYPES)(flattenedData);
-        console.log(stackedData)
+        // console.log(stackedData)
 
         var data = svg.append("g").selectAll("g").data(stackedData).enter().append("g").attr("fill", d => colorScale(d.key)).selectAll("rect").data(d => d).enter().append("rect").attr("x", d => xScale(d.data.city)).attr("y", d => yScale(d[1])).attr("height", d => yScale(d[0]) - yScale(d[1])).attr("width", xScale.bandwidth());
 
         // labels
-        var title = svg.append("text").attr("x", WIDTH / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Average Cleanliness Rating for Each City");
+        var title = svg.append("text").attr("x", WIDTH / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Average Cleanliness Rating for Each City").style("font-weight", "bold");
         var xAxisLabel = svg.append("text").attr("x", WIDTH / 2).attr("y", HEIGHT - MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "16px").text("City");
         var yAxisLabel = svg.append("text").attr("x", -HEIGHT / 2).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "16px").text("Average Cleanliness Rating").attr("transform", "rotate(-90)");
 
@@ -189,5 +192,68 @@ var plot3 = function (filePath) {
         }).on("mousemove", function (d) { tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"); }).on("mouseout", function (d) {
             tooltip.style("visibility", "hidden");
         });
+    });
+}
+
+var plot4 = function (filePath) {
+    // plot the map of Europe
+
+    d3.csv(filePath).then(function (data) {
+        d3.json("data/europe.geojson").then(function (geoData) {
+            // console.log(geoData)
+
+            const WIDTH = 1000;
+            const HEIGHT = 700;
+            const MARGIN = 100;
+
+            var svg = d3.select("#q4_plot").append("svg").attr("width", WIDTH).attr("height", HEIGHT);
+
+            var projection = d3.geoMercator().fitSize([WIDTH, HEIGHT], geoData);
+            var path = d3.geoPath().projection(projection);
+            var geoplot = svg.append("g").attr("x", MARGIN).selectAll("path").data(geoData.features).enter().append("path").attr("d", path).attr("fill", "lightgrey").attr("stroke", "black").attr("class", "country");
+            // enlarge the outline of the countries
+            geoplot.on("mouseover", d => {
+                d3.select(d.toElement).transition().duration(100).attr("stroke-width", 2.5);
+            });
+            geoplot.on("mouseleave", d => {
+                console.log('leave')
+                d3.selectAll(".country").transition().duration(200).attr("stroke-width", 1);
+            });
+
+            // plot each airbnb listing on the map with longitude (lng) and latitude (lat)
+            data = d3.map(data, function (d) {
+                return { city: d.city, lat: parseFloat(d.lat), lng: parseFloat(d.lng), room_type: d.room_type };
+            });
+            console.log(data);
+
+            // get the percentage of listings that are private rooms
+            var privateRoom = d3.rollup(data, v => [d3.mean(v, d => d.room_type == "Private room" ? 1.0 : 0.0), v[0].lng, v[0].lat], d => d.city);
+            privateRoom = d3.map(privateRoom, function (d) {
+                return { city: d[0], percentage: d[1][0], lng: d[1][1], lat: d[1][2] };
+            });
+            // create a continuous color scale for the percentage of private rooms
+            var colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, 1]);
+
+            // plot the percentage of private rooms on the map and add names of the cities
+            svg.selectAll("circle").data(privateRoom).enter().append("circle").attr("cx", d => projection([d.lng, d.lat])[0]).attr("cy", d => projection([d.lng, d.lat])[1]).attr("r", 7).attr("fill", d => colorScale(d.percentage)).attr("stroke", "black").attr("stroke-width", 0.5);
+            svg.selectAll("text").data(privateRoom).enter().append("text").attr("x", d => projection([d.lng, d.lat])[0] + 10).attr("y", d => projection([d.lng, d.lat])[1] + 5).text(d => d.city[0].toUpperCase() + d.city.slice(1)).attr("font-size", "13px").style("fill", "black").style("font-weight", "bold");
+
+            // legend
+            var legend = svg.append("g").attr("transform", "translate(" + (WIDTH - MARGIN) + "," + (HEIGHT - MARGIN) + ")");
+            var yScale = d3.scaleBand().domain([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]).range([-100, 100]);
+            var yAxis = d3.axisRight(yScale).tickFormat(d3.format(".0%")).tickSize(0);
+            legend.append("g").call(yAxis);
+            legend.selectAll("rect").data([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]).enter().append("rect").attr("x", -20).attr("y", d => yScale(d)).attr("width", 20).attr("height", 20).attr("fill", d => colorScale(d)).attr("stroke", "black").attr("stroke-width", 0.5);
+
+            // title
+            svg.append("text").attr("x", MARGIN + 200).attr("y", MARGIN / 2).attr("text-anchor", "middle").attr("font-size", "24px").text("Percentage of Private Rooms in Each City").style("font-weight", "bold");
+        });
+    });
+
+}
+
+var plot5 = function (filePath) {
+    d3.csv(filePath).then(function (data) {
+
     });
 }

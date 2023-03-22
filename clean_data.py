@@ -7,7 +7,7 @@ if __name__ == "__main__":
     for datafile in os.listdir("data"):
         if datafile == "final_output.csv":
             continue
-        current = pd.read_csv("data/" + datafile).sample(frac=0.2)
+        current = pd.read_csv("data/" + datafile).sample(frac=0.5)
         current["is_weekend"] = "weekend" in datafile
         current["city"] = datafile.split("_")[0]
         if final_output is None:
